@@ -11,21 +11,25 @@
 #include <omp.h>
 //#include <bits/stdc++.h> 
 using namespace std;
-# define INF 0x3f3f3f3f
+
 
 class Graph
 {
 protected:
-	int V;//nodok száma
-	list<int> *adj; // pointer a szomszédsági lista tombre
+	int V;//number of nodes
+	list<int> *adj; // pointer to adjency list
 	bool isCyclicUtil(int v, bool visited[], int parent);
 	bool isCyclicUtil_omp(int v, bool visited[], int parent);
 public:
-	Graph(int V);   // Constructor 
-	void addEdge(int v, int w);   // to add an edge to graph 
+	// Constructor 
+	Graph(int V);   
+	// to add an edge to graph 
+	void addEdge(int v, int w); 
+	//Method to execute Bfs serch in graph
 	bool BFS(int src, int dest, int v, vector<int>& pred, vector<int>& dist);
 	bool BFS_omp(int src, int dest, int v, vector<int>& pred, vector<int>& dist);
-	bool isTree();   // returns true if graph is tree 
+	// returns true if graph is tree 
+	bool isTree();   
 	bool isTree_omp();
 	// Method to check if this graph is Eulerian or not 
 	int isEulerian();
@@ -33,13 +37,16 @@ public:
 	// Method to check if all non-zero degree vertices are connected 
 	bool isConnected();
 	bool isConnected_omp();
+	//method to determine shortest path in graph between nodes s and dest
 	void printShortestDistance(int s, int dest, int v);
 	void printShortestDistance_omp(int s, int dest, int v);
 	// Function to do DFS starting from v. Used in isConnected(); 
 	void DFSUtil(int v, vector<bool>& visited);
 	void DFSUtil_omp(int v, vector<bool>& visited);
+	//Method to determine number of edges for a  node and total sum of them
 	void countEdges();
 	void countEdges_omp();
+	// utility function to display edges
 	void printEdges(list<int> nodes, int sum);
 };
 Graph::Graph(int V)
@@ -60,7 +67,7 @@ bool Graph::BFS( int src, int dest, int v,vector<int>& pred, vector<int>& dist)
 	// DFS algorithm 
 	list<int> queue;
 
-	// boolean array visited[] which stores the 
+	// boolean vector visited which stores the 
 	// information whether ith vertex is reached 
 	// at least once in the Breadth first search 
 	vector<bool> visited;
@@ -69,7 +76,7 @@ bool Graph::BFS( int src, int dest, int v,vector<int>& pred, vector<int>& dist)
 	// so v[i] for all i is false 
 	// and as no path is yet constructed 
 	// dist[i] for all i set to infinity 
-	//vector<bool>::iterator i;
+	
 	for (int i = 0; i < V;i++) {
 		visited.push_back(false);
 		dist.push_back(INT_MAX);
@@ -96,8 +103,7 @@ bool Graph::BFS( int src, int dest, int v,vector<int>& pred, vector<int>& dist)
 				pred.at(*i) = u;
 				queue.push_back(*i);
 
-				// We stop BFS when we find 
-				// destination. 
+				// We stop BFS when we find destination. 
 				if (*i == dest)
 					return true;
 			}
@@ -115,7 +121,7 @@ bool Graph::BFS_omp(int src, int dest, int v, vector<int>& pred, vector<int>& di
 	// DFS algorithm 
 	list<int> queue;
 
-	// boolean array visited[] which stores the 
+	// boolean vector visited which stores the 
 	// information whether ith vertex is reached 
 	// at least once in the Breadth first search 
 	vector<bool> visited;
@@ -124,7 +130,7 @@ bool Graph::BFS_omp(int src, int dest, int v, vector<int>& pred, vector<int>& di
 	// so v[i] for all i is false 
 	// and as no path is yet constructed 
 	// dist[i] for all i set to infinity 
-	//vector<bool>::iterator i;
+	
 //#pragma omp parallel for
 	for (int i = 0; i < V; i++) {
 		visited.push_back(false);
@@ -152,8 +158,7 @@ bool Graph::BFS_omp(int src, int dest, int v, vector<int>& pred, vector<int>& di
 				pred.at(*i) = u;
 				queue.push_back(*i);
 
-				// We stop BFS when we find 
-				// destination. 
+				// We stop BFS when we find  destination. 
 				if (*i == dest)
 					return true;
 			}
@@ -178,6 +183,7 @@ void Graph::printShortestDistance( int s,int dest, int v)
 	}
 	// vector path stores the shortest path 
 	vector<int> path;
+	//using crawl as the index of the node
 	int crawl = dest;
 	path.push_back(crawl);
 	while (pred.at(crawl) != -1) {
@@ -233,7 +239,7 @@ void Graph::printShortestDistance_omp(int s, int dest, int v)
 
 void Graph::DFSUtil(int v, vector<bool>& visited)
 {
-	// Mark the current node as visited and print it 
+	// Mark the current node as visited 
 	visited[v] = true;
 
 	// Recur for all the vertices adjacent to this vertex 
@@ -245,7 +251,7 @@ void Graph::DFSUtil(int v, vector<bool>& visited)
 
 void Graph::DFSUtil_omp(int v, vector<bool>& visited)
 {
-	// Mark the current node as visited and print it 
+	// Mark the current node as visited
 	visited[v] = true;
 
 	// Recur for all the vertices adjacent to this vertex 
@@ -264,7 +270,7 @@ void Graph::DFSUtil_omp(int v, vector<bool>& visited)
 bool Graph::isConnected()
 {
 	// Mark all the vertices as not visited 
-	//bool visited[V];
+	
 	vector<bool> visited(V);
 	int i;
 	for (i = 0; i < V; i++)
@@ -293,7 +299,7 @@ bool Graph::isConnected()
 bool Graph::isConnected_omp()
 {
 	// Mark all the vertices as not visited 
-	//bool visited[V];
+	
 	vector<bool> visited(V);
 	int i;
 	for (i = 0; i < V; i++)
@@ -537,6 +543,7 @@ void Graph::countEdges()
 	{
 		// add all edge that are linked to the 
 		// current vertex 
+		// add edges to to current node
 		sum += adj[i].size();
 		nodes.push_back(adj[i].size());
 	}
@@ -556,6 +563,7 @@ void Graph::countEdges_omp()
 	{
 		// add all edge that are linked to the 
 		// current vertex 
+		// add edges to to current node
 		sum += adj[i].size();
 		nodes.push_back(adj[i].size());
 	}
@@ -610,13 +618,13 @@ int main()
 	double time2 = 0;
 	for (int i = 0; i < 10; i++)
 	{
-	double t2 = omp_get_wtime();
-	g6.countEdges_omp();
-	testeuler_omp(g6);
-	testTree_omp(g6);
-	g6.printShortestDistance_omp(0, 5, 9);
-	t2 = omp_get_wtime() - t2;
-	time2 += t2;
+		double t2 = omp_get_wtime();
+		g6.countEdges_omp();
+		testeuler_omp(g6);
+		testTree_omp(g6);
+		g6.printShortestDistance_omp(0, 5, 9);
+		t2 = omp_get_wtime() - t2;
+		time2 += t2;
 	}
 	cout << "sequential took time :" << time1 / 10 << " s" << endl;
 	cout << "parallel took time :" << time2 / 10 << " s" << endl;
